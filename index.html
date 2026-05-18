@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Falcon News - أخبار Pi والعملات الرقمية</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{--pi-purple:#6c35de;--pi-dark:#4a1fa8;--pi-light:#9b6ef3;--pi-gold:#f5a623;--pi-green:#27ae60;--pi-red:#e74c3c;--pi-blue:#2980b9;--bg:#07090f;--card:#0e1118;--card2:#141820;--text:#dde8f5;--muted:#5a6a80;--border:#1a2030;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    /* TICKER */
+    .ticker{background:var(--pi-red);color:#fff;padding:6px 0;overflow:hidden;white-space:nowrap;}
+    .ticker-inner{display:inline-block;animation:ticker 30s linear infinite;}
+    @keyframes ticker{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+    .ticker-item{display:inline-block;margin-left:40px;font-size:.85rem;font-weight:700;}
+    nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+    .nav-logo{font-size:1.3rem;font-weight:900;color:var(--pi-gold);display:flex;align-items:center;gap:8px;}
+    .btn{background:var(--pi-purple);color:#fff;border:none;padding:8px 18px;border-radius:25px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;}
+    .btn-gold{background:var(--pi-gold);color:#000;border:none;padding:8px 18px;border-radius:25px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;}
+    /* CATS */
+    .cats-bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto;}
+    .cat-tab{padding:12px 18px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;font-size:.88rem;}
+    .cat-tab.active{color:var(--pi-gold);border-bottom-color:var(--pi-gold);}
+    /* LAYOUT */
+    .main-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;padding:20px;max-width:1200px;margin:0 auto;}
+    /* FEATURED */
+    .featured{background:linear-gradient(135deg,#0a1020,var(--bg));border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;}
+    .featured::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(245,166,35,.1),transparent);border-radius:50%;}
+    .breaking-badge{background:var(--pi-red);color:#fff;padding:3px 12px;border-radius:12px;font-size:.72rem;font-weight:700;display:inline-block;margin-bottom:10px;animation:blink 2s infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.7}}
+    .featured-title{font-size:1.5rem;font-weight:900;margin-bottom:10px;line-height:1.4;}
+    .featured-excerpt{color:var(--muted);line-height:1.7;margin-bottom:14px;}
+    .featured-meta{display:flex;gap:16px;color:var(--muted);font-size:.82rem;flex-wrap:wrap;}
+    /* NEWS CARDS */
+    .news-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;gap:14px;cursor:pointer;transition:.2s;}
+    .news-card:hover{border-color:var(--pi-gold);}
+    .news-thumb{width:90px;height:75px;border-radius:10px;background:linear-gradient(135deg,var(--pi-dark),var(--card2));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;}
+    .news-cat{font-size:.72rem;color:var(--pi-gold);font-weight:700;margin-bottom:4px;text-transform:uppercase;}
+    .news-title{font-size:.95rem;font-weight:700;margin-bottom:6px;line-height:1.4;}
+    .news-meta{display:flex;gap:10px;color:var(--muted);font-size:.78rem;}
+    /* PRICE TICKER */
+    .price-widget{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;}
+    .widget-title{font-weight:700;margin-bottom:12px;font-size:.95rem;color:var(--pi-gold);}
+    .price-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+    .price-row:last-child{border:none;}
+    .coin-name{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem;}
+    .coin-icon{font-size:1.2rem;}
+    .price-val{font-weight:700;}
+    .price-change{font-size:.82rem;font-weight:700;}
+    .up{color:var(--pi-green);}
+    .down{color:var(--pi-red);}
+    /* PREMIUM */
+    .premium-widget{background:linear-gradient(135deg,var(--pi-dark),#1a0a2e);border:1px solid var(--pi-gold);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center;}
+    .premium-icon{font-size:2rem;margin-bottom:8px;}
+    .premium-title{font-weight:900;margin-bottom:6px;}
+    .premium-desc{color:var(--muted);font-size:.85rem;margin-bottom:14px;line-height:1.6;}
+    /* ANALYSIS */
+    .analysis-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+    .analysis-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+    .analysis-title{font-weight:700;}
+    .lock-badge{background:var(--pi-gold);color:#000;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:700;}
+    .analysis-preview{color:var(--muted);font-size:.88rem;line-height:1.6;position:relative;}
+    .analysis-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--card));}
+    /* NEWSLETTER */
+    .newsletter{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;}
+    .nl-input{display:flex;gap:8px;margin-top:10px;}
+    .nl-input input{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:10px;font-family:'Cairo',sans-serif;outline:none;font-size:.88rem;}
+    .nl-input button{background:var(--pi-gold);color:#000;border:none;padding:9px 14px;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;font-size:.85rem;}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pi-green);color:#fff;padding:12px 24px;border-radius:30px;font-weight:700;z-index:999;display:none;}
+    @media(max-width:768px){.main-layout{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">🔴 عاجل: Pi Network تعلن عن تحديث جديد للمنصة</span>
+    <span class="ticker-item">📈 Pi تسجل ارتفاعاً بنسبة 12% خلال 24 ساعة</span>
+    <span class="ticker-item">🌐 إطلاق 500 نطاق Pi جديد في مزاد اليوم</span>
+    <span class="ticker-item">💰 حجم تداول Pi يتجاوز 50 مليون دولار</span>
+    <span class="ticker-item">🚀 Pi تدخل قائمة أفضل 50 عملة رقمية عالمياً</span>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo"><span>🦅</span> Falcon News</div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn-gold" onclick="subscribePremium()">⭐ Premium</button>
+    <button class="btn" onclick="loginWithPi()">دخول بـ Pi</button>
+  </div>
+</nav>
+
+<div class="cats-bar">
+  <div class="cat-tab active" onclick="filterNews('all',this)">الكل</div>
+  <div class="cat-tab" onclick="filterNews('Pi',this)">Pi Network</div>
+  <div class="cat-tab" onclick="filterNews('تحليل',this)">تحليلات</div>
+  <div class="cat-tab" onclick="filterNews('أسواق',this)">الأسواق</div>
+  <div class="cat-tab" onclick="filterNews('تقنية',this)">تقنية</div>
+  <div class="cat-tab" onclick="filterNews('مقابلات',this)">مقابلات</div>
+</div>
+
+<div class="main-layout">
+  <div>
+    <!-- FEATURED NEWS -->
+    <div class="featured">
+      <span class="breaking-badge">🔴 عاجل</span>
+      <div class="featured-title">Pi Network تُعلن عن إطلاق منصة التطبيقات الكاملة في الربع الثالث من 2026</div>
+      <div class="featured-excerpt">أعلنت Pi Network رسمياً عن خارطة طريق جديدة تتضمن إطلاق منصة التطبيقات اللامركزية بشكل كامل، مما يفتح الباب أمام ملايين المطورين لبناء تطبيقات حقيقية ومربحة على شبكة Pi...</div>
+      <div class="featured-meta">
+        <span>✍️ فريق Falcon News</span>
+        <span>📅 18 مايو 2026</span>
+        <span>⏱️ 5 دقائق قراءة</span>
+        <span>👁️ 45,200 مشاهدة</span>
+      </div>
+    </div>
+
+    <!-- NEWS LIST -->
+    <div id="newsList"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div>
+    <!-- PRICE WIDGET -->
+    <div class="price-widget">
+      <div class="widget-title">💹 أسعار العملات الرقمية</div>
+      <div class="price-row">
+        <div class="coin-name"><span class="coin-icon">π</span> Pi</div>
+        <div><div class="price-val">$1.85</div><div class="price-change up">↑ +12.4%</div></div>
+      </div>
+      <div class="price-row">
+        <div class="coin-name"><span class="coin-icon">₿</span> Bitcoin</div>
+        <div><div class="price-val">$98,420</div><div class="price-change up">↑ +2.1%</div></div>
+      </div>
+      <div class="price-row">
+        <div class="coin-name"><span class="coin-icon">Ξ</span> Ethereum</div>
+        <div><div class="price-val">$4,230</div><div class="price-change down">↓ -0.8%</div></div>
+      </div>
+      <div class="price-row">
+        <div class="coin-name"><span class="coin-icon">◎</span> Solana</div>
+        <div><div class="price-val">$185</div><div class="price-change up">↑ +5.3%</div></div>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:8px;text-align:center;">آخر تحديث: منذ 5 دقائق</div>
+    </div>
+
+    <!-- PREMIUM WIDGET -->
+    <div class="premium-widget">
+      <div class="premium-icon">⭐</div>
+      <div class="premium-title">Falcon News Premium</div>
+      <div class="premium-desc">احصل على تحليلات حصرية، تنبيهات أسعار فورية، وتقارير أسبوعية متعمقة</div>
+      <button class="btn-gold" style="width:100%;padding:11px;" onclick="subscribePremium()">اشترك بـ 1 π/شهر</button>
+    </div>
+
+    <!-- PREMIUM ANALYSIS -->
+    <div style="font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--pi-gold);">🔒 تحليلات حصرية Premium</div>
+    <div class="analysis-card">
+      <div class="analysis-header">
+        <div class="analysis-title">توقعات Pi لنهاية 2026</div>
+        <span class="lock-badge">🔒 Premium</span>
+      </div>
+      <div class="analysis-preview" style="max-height:60px;overflow:hidden;">
+        بناءً على تحليل البيانات الفنية والأساسية، نتوقع أن تصل Pi إلى...
+      </div>
+      <button class="btn-gold" style="margin-top:12px;width:100%;padding:9px;font-size:.85rem;" onclick="subscribePremium()">اقرأ التحليل الكامل</button>
+    </div>
+    <div class="analysis-card">
+      <div class="analysis-header">
+        <div class="analysis-title">أفضل 10 نطاقات Pi للاستثمار</div>
+        <span class="lock-badge">🔒 Premium</span>
+      </div>
+      <div class="analysis-preview" style="max-height:60px;overflow:hidden;">
+        قائمة مختارة بعناية لأفضل النطاقات المتاحة حالياً والتي تمتلك...
+      </div>
+      <button class="btn-gold" style="margin-top:12px;width:100%;padding:9px;font-size:.85rem;" onclick="subscribePremium()">اقرأ التحليل الكامل</button>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="newsletter">
+      <div class="widget-title">📧 النشرة البريدية</div>
+      <div style="color:var(--muted);font-size:.85rem;">احصل على ملخص يومي لأهم أخبار Pi</div>
+      <div class="nl-input">
+        <input type="email" placeholder="بريدك الإلكتروني" id="emailInput" />
+        <button onclick="subscribe()">اشترك</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  Pi.init({ version: "2.0", sandbox: true });
+
+  const news = [
+    {id:1,emoji:"🚀",cat:"Pi",title:"Pi تتجاوز مليار مستخدم مسجّل في التاريخ",excerpt:"حققت Pi Network إنجازاً تاريخياً بتجاوز عدد مستخدميها المسجلين مليار شخص حول العالم...",author:"فريق Falcon",date:"اليوم",readTime:"3 دقائق",views:"28,400"},
+    {id:2,emoji:"📊",cat:"تحليل",title:"تحليل: لماذا ترتفع Pi بشكل متسارع في 2026؟",excerpt:"يرصد محللو Falcon News الأسباب الحقيقية وراء الارتفاع المتسارع لعملة Pi خلال الأشهر الأخيرة...",author:"خالد التحليلي",date:"أمس",readTime:"7 دقائق",views:"15,200"},
+    {id:3,emoji:"💼",cat:"أسواق",title:"مزاد نطاقات Pi: أسعار قياسية في الجولة الأخيرة",excerpt:"شهد مزاد نطاقات Pi الأخير أسعاراً قياسية غير مسبوقة، مع تنافس شديد على النطاقات المميزة...",author:"سارة الأسواق",date:"منذ يومين",readTime:"4 دقائق",views:"9,800"},
+    {id:4,emoji:"🔧",cat:"تقنية",title:"Pi SDK 3.0: ميزات جديدة تُحدث ثورة في التطوير",excerpt:"أطلقت Pi Network الإصدار الثالث من حزمة تطوير التطبيقات مع ميزات مبهرة تسهّل بناء التطبيقات...",author:"أحمد التقني",date:"منذ 3 أيام",readTime:"6 دقائق",views:"12,100"},
+    {id:5,emoji:"🎤",cat:"مقابلات",title:"مقابلة حصرية مع مطور Pi: كيف ربحت 10,000 Pi من تطبيق واحد",excerpt:"تحدثنا حصرياً مع أحد أنجح مطوري Pi عن رحلته من الصفر إلى تحقيق دخل شهري ثابت...",author:"فريق Falcon",date:"منذ 4 أيام",readTime:"8 دقائق",views:"22,600"},
+    {id:6,emoji:"🌐",cat:"Pi",title:"Pi تُطلق شراكات استراتيجية مع 50 شركة عالمية",excerpt:"أعلنت Pi Network عن سلسلة من الشراكات الاستراتيجية مع شركات عالمية كبرى لتوسيع نطاق قبول عملتها...",author:"فريق Falcon",date:"منذ أسبوع",readTime:"5 دقائق",views:"18,900"},
+  ];
+
+  let activeNewsCat = 'all';
+
+  function renderNews(list) {
+    document.getElementById('newsList').innerHTML = list.map(n => `
+      <div class="news-card" onclick="showToast('📖 فتح: ${n.title.substring(0,30)}...')">
+        <div class="news-thumb">${n.emoji}</div>
+        <div style="flex:1;">
+          <div class="news-cat">${n.cat}</div>
+          <div class="news-title">${n.title}</div>
+          <div style="color:var(--muted);font-size:.85rem;margin-bottom:6px;">${n.excerpt.substring(0,100)}...</div>
+          <div class="news-meta">
+            <span>✍️ ${n.author}</span>
+            <span>📅 ${n.date}</span>
+            <span>⏱️ ${n.readTime}</span>
+            <span>👁️ ${n.views}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterNews(cat, el) {
+    activeNewsCat = cat;
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const list = cat === 'all' ? news : news.filter(n => n.cat === cat);
+    renderNews(list);
+  }
+
+  function subscribePremium() {
+    Pi.createPayment({
+      amount: 1,
+      memo: 'Falcon News Premium - اشتراك شهري',
+      metadata: { plan: 'premium', duration: 'monthly' }
+    }, {
+      onReadyForServerApproval: () => showToast('✓ جاري تفعيل اشتراك Premium...'),
+      onReadyForServerCompletion: () => showToast('🎉 تم تفعيل Premium! استمتع بالتحليلات الحصرية.'),
+      onCancel: () => showToast('❌ تم إلغاء الاشتراك'),
+      onError: (e) => showToast('⚠️ ' + e.message)
+    });
+  }
+
+  function subscribe() {
+    const email = document.getElementById('emailInput').value;
+    if (!email) { showToast('⚠️ يرجى إدخال بريدك الإلكتروني'); return; }
+    showToast('✓ تم الاشتراك في النشرة البريدية!');
+    document.getElementById('emailInput').value = '';
+  }
+
+  function loginWithPi() {
+    Pi.authenticate(['username','payments'], (auth) => {
+      showToast('✓ مرحباً ' + auth.user.username);
+    }, (err) => showToast('⚠️ ' + err));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  renderNews(news);
+</script>
+</body>
+</html>
