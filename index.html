@@ -251,9 +251,13 @@
   }
 
   function loginWithPi() {
-    Pi.authenticate(['username','payments'], (auth) => {
-      showToast('✓ مرحباً ' + auth.user.username);
-    }, (err) => showToast('⚠️ ' + err));
+    Pi.authenticate(['username','payments'], function(p){ console.log('Incomplete:',p); }).then(function(auth){
+      if(auth && auth.user){
+        var btn = document.getElementById('loginBtn');
+        if(btn) btn.textContent = auth.user.username;
+        showToast('Welcome ' + auth.user.username);
+      }
+    }).catch(function(e){ console.log('Auth error:',e); });
   }
 
   function showToast(msg) {
@@ -265,9 +269,6 @@
 
   renderNews(news);
 
-}catch(e){ console.log('Pi SDK error:',e); }
-  }, 500);
-});
 
 // Auto-authenticate on load as required by Pi App Studio
 window.addEventListener('load', function(){
